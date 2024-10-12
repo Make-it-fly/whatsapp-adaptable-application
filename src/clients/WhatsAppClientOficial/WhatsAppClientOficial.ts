@@ -3,6 +3,7 @@ import express, { Application } from 'express';
 import { IMessageClient, ISendMessageConfigs } from "../../whatsapp/interfaces/message-client";
 import { IMessageData } from "../../whatsapp/interfaces/message-data";
 import { PossibleClients } from "../../whatsapp/types/types";
+import AppError from "../../whatsapp/errors/AppError";
 dotenv.config();
 
 export default class WhatsAppClientOficial implements IMessageClient {
@@ -105,7 +106,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
     }
   }
 
-  private async _fetchSendMessage(number: string, message: string, configs: ISendMessageConfigs) {
+  private async _fetchSendMessage(number: string, message: string, configs?: ISendMessageConfigs) {
     try {
       const response = await fetch(`https://graph.facebook.com/${process.env.WPPOFICIAL_VERSION}/${process.env.WPPOFICIAL_PHONE_NUMBER_ID}/messages`, {
         method: "POST",
@@ -125,7 +126,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         })
       })
       if (!response.ok) {
-        throw new Error(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
+        throw new AppError(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
       }
 
       const data = await response.json();
@@ -135,6 +136,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
   }
   private async _fetchSendButtonsMessage(number: string, message: string, configs: ISendMessageConfigs) {
     try {
+      if (!configs.options) throw new AppError("_fetchSendButtonsMessage chamado sem especificar botões.");
       const buttons = configs.options.map((option, i) => {
         return {
           "type": "reply",
@@ -174,7 +176,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         })
       })
       if (!response.ok) {
-        throw new Error(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
+        throw new AppError(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
       }
 
       const data = await response.json();
@@ -186,6 +188,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
   }
   private async _fetchSendListsMessage(number: string, message: string, configs: ISendMessageConfigs) {
     try {
+      if (!configs.options) throw new AppError("_fetchSendListsMessage chamado sem especificar opções.");
       const options = configs.options.map((option, i) => {
         return {
           "id": `<LIST_SECTION_${i + 1}_ROW_${i + 1}_ID>`,
@@ -228,7 +231,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         })
       })
       if (!response.ok) {
-        throw new Error(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
+        throw new AppError(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
       }
 
       const data = await response.json();
