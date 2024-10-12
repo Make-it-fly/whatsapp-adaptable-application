@@ -1,11 +1,11 @@
 import dotenv, { config } from "dotenv";
-import { IMessageClient, ISendMessageConfigs } from '../interfaces/message-client';
+import { IMessageClient, ISendMessageConfigs } from '../../interfaces/message-client';
 import express, { Application } from 'express';
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
-import { IMessageData } from "../interfaces/message-data";
-import { PossibleClients } from "../types/types";
+import { IMessageData } from "../../interfaces/message-data";
+import { PossibleClients } from "../../types/types";
 dotenv.config();
 
 export default class WhatsAppClientOficial implements IMessageClient {

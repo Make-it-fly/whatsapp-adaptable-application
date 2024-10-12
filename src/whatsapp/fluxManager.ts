@@ -1,13 +1,13 @@
 import { ProjetoManager } from "../classes/projeto-manager";
-import { IMessageClient } from "../interfaces/message-client";
-import { IMessageData } from "../interfaces/message-data";
-import IState from "../interfaces/state";
+import { IMessageClient } from "./interfaces/message-client";
+import { IMessageData } from "./interfaces/message-data";
+import IState from "./interfaces/state";
 import InitialState from "../states/initial";
 import InitialSelecionarProjetoState from "../states/projeto/initial-selecionar-projeto";
 import ProjetoAtividadeDeletarState from "../states/projeto/atividade/projeto-atividade-deletar";
 import ProjetoGerenciar from "../states/projeto/projeto-gerenciar";
 import StartState from "../states/start";
-import { PersonNumber } from "../types/types";
+import { PersonNumber } from "./types/types";
 import ProjetoCriarState from "../states/projeto/projeto-criar";
 import ProjetoAtividadeCriarState from "../states/projeto/atividade/projeto-atividade-criar";
 import ProjetoAtividadeAlterarState from "../states/projeto/atividade/projeto-atividade-alterar";
@@ -33,7 +33,7 @@ interface IChatStates {
     }
 }
 
-class ChatHandler {
+class FluxManager {
     private personStates: IChatStates;
     stateMap: StateMap;
     manager: ProjetoManager;
@@ -71,7 +71,7 @@ class ChatHandler {
         console.log(`Acesso: ${personNumber} (${personName}) Estado: ${state}`)
 
         if (state === "start") {
-            return this.stateMap.start.call(personNumber);
+            return this.stateMap.start.render(personNumber);
         }
 
         const currentStateHandler: IState = this.stateMap[state];
@@ -114,4 +114,4 @@ class ChatHandler {
     }
 }
 
-export default ChatHandler;
+export default FluxManager;

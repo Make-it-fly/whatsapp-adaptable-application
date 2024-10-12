@@ -1,13 +1,13 @@
 import { ProjetoManager } from "../../classes/projeto-manager";
 import State from "../../classes/state";
-import ChatHandler from "../../handlers/chatHandler";
-import IState from "../../interfaces/state";
-import { PersonNumber } from "../../types/types";
+import FluxManager from "../../whatsapp/fluxManager";
+import IState from "../../whatsapp/interfaces/state";
+import { PersonNumber } from "../../whatsapp/types/types";
 
 class ProjetoGerenciar extends State implements IState {
 
-  constructor(chatHandler: ChatHandler) {
-    super(chatHandler)
+  constructor(fluxManager: FluxManager) {
+    super(fluxManager)
     this.manager = ProjetoManager.getInstance()
     this.optionsMap = {
       'Listar Atividades': this.optionListarAtividades.bind(this),

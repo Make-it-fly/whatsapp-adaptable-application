@@ -1,10 +1,10 @@
 import State from "../classes/state";
-import ChatHandler from "../handlers/chatHandler";
+import FluxManager from "../whatsapp/fluxManager";
 import IState from "../interfaces/state";
 
 class InitialState extends State implements IState {
-    constructor(chatHandler: ChatHandler) {
-        super(chatHandler)
+    constructor(fluxManager: FluxManager) {
+        super(fluxManager)
         this.optionsMap = {
             'Gerir um projeto': this.handleOption1,
             'Criar um projeto': this.handleOption2,

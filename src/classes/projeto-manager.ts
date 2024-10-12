@@ -1,4 +1,4 @@
-import { PersonNumber } from "../types/types";
+import { PersonNumber } from "../whatsapp/types/types";
 import { Projeto } from "./projeto";
 
 export class ProjetoManager {

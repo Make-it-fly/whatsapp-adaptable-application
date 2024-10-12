@@ -1,10 +1,10 @@
-import ChatHandler from "../handlers/chatHandler";
-import { PersonNumber } from "../types/types";
+import FluxManager from "../whatsapp/fluxManager";
+import { PersonNumber } from "../whatsapp/types/types";
 
 interface IState {
-  handler: ChatHandler;
+  handler: FluxManager;
   handleOption(option: string | number, personNumber: PersonNumber): void;
-  call?(personNumber: PersonNumber): Promise<void>;
+  render?(personNumber: PersonNumber): Promise<void>;
   sendMessage?(number: string | number, message: string, otherProps?: any): Promise<any>;
   cancel(personNumber: PersonNumber): void;
 }

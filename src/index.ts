@@ -1,10 +1,10 @@
-import WhatsAppClientOficial from "./clients/WhatsAppClientOficial";
-import ChatHandler from "./handlers/chatHandler";
-import { IMessageData } from "./interfaces/message-data";
+import WhatsAppClientOficial from "./whatsapp/clients/WhatsAppClientOficial/WhatsAppClientOficial";
+import FluxManager from "./whatsapp/fluxManager";
+import { IMessageData } from "./whatsapp/interfaces/message-data";
 
 
 const app = new WhatsAppClientOficial();
-const chatHandler = new ChatHandler(app)
+const fluxManager = new FluxManager(app)
 
 
 app.start().catch((error) => {
@@ -13,7 +13,7 @@ app.start().catch((error) => {
 
 // Example of how to use the on method to handle events
 app.on('message', (msg: IMessageData) => {
-  chatHandler.handle(msg)
+  fluxManager.handle(msg)
 });
 
 app.on('ready', () => {

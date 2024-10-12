@@ -1,17 +1,17 @@
-import ChatHandler from "../handlers/chatHandler";
-import { IMessageClient } from "../interfaces/message-client";
-import IState from "../interfaces/state";
-import { PersonNumber } from "../types/types";
+import FluxManager from "../whatsapp/fluxManager";
+import { IMessageClient } from "../whatsapp/interfaces/message-client";
+import IState from "../whatsapp/interfaces/state";
+import { PersonNumber } from "../whatsapp/types/types";
 import { ProjetoManager } from "./projeto-manager";
 
 class State implements IState {
-  handler: ChatHandler;
+  handler: FluxManager;
   client: IMessageClient;
   manager: ProjetoManager
   protected optionsMap: Record<string | number, (personNumber: PersonNumber) => void>;
 
-  constructor(chatHandler: ChatHandler) {
-    this.handler = chatHandler;
+  constructor(fluxManager: FluxManager) {
+    this.handler = fluxManager;
     this.client = this.handler.client;
     this.manager = ProjetoManager.getInstance()
   }
@@ -32,7 +32,7 @@ class State implements IState {
   public async cancel(personNumber) {
     await this.handler.client.sendMessage(personNumber, "Ok, cancelando a sua ação.")
     this.handler.setPersonState(personNumber, "start")
-    this.handler.stateMap["start"].call(personNumber)
+    this.handler.stateMap["start"].render(personNumber)
   }
 
   public getAction(option: string) {

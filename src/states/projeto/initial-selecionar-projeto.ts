@@ -1,5 +1,5 @@
 import State from "../../classes/state";
-import ChatHandler from "../../handlers/chatHandler";
+import FluxManager from "../../whatsapp/fluxManager";
 import IState from "../../interfaces/state";
 
 class InitialSelecionarProjetoState extends State implements IState {
