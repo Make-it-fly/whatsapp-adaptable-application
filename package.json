@@ -19,13 +19,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "fs": "^0.0.1-security",
-    "mssql": "^10.0.2",
+    "mssql": "^11.0.1",
     "ollama": "^0.5.0",
     "oracledb": "^6.3.0",
     "pg": "^8.12.0",
     "pgml": "^0.10.1",
-    "puppeteer": "^22.6.5",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#webpack-exodus"
+    "puppeteer": "^22.6.5"
   }
 }

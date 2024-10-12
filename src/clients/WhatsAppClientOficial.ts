@@ -67,7 +67,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
       const mode = req.query["hub.mode"];
       const verify_token = req.query["hub.verify_token"];
 
-      if (mode == "subscribe" && verify_token == "RECEIVED") {
+      if (mode == "subscribe" && verify_token == process.env.WPPOFICIAL_VERIFICATION_TOKEN) {
         return res.status(200).send(challenge)
       }
       res.status(400).send()
