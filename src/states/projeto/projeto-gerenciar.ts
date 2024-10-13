@@ -26,11 +26,19 @@ class ProjetoGerenciar extends State implements IState {
     this.fluxManager.setPersonState(personNumber, "projeto-gerenciar");
     await this.client.sendMessage(personNumber, message, projetoSelecionado ? {
       type: "list",
-      options: [
-        { name: "Listar Atividades​" },
-        { name: "Adicionar Atividade" },
-        { name: "Deletar Atividades" },
-        { name: "Cancelar" },
+      listOptions: [
+        {
+          sectionName: "Atividades", rows: [
+            { name: "Listar Atividades​", description: "Lista todas as atividades existentes neste projeto." },
+            { name: "Adicionar Atividade", description: "Adiciona uma nova atividade neste projeto." },
+            { name: "Deletar Atividades", description: "Deleta uma das atividades existentes neste projeto." },
+          ]
+        },
+        {
+          sectionName: "Outros", rows: [
+            { name: "cancelar", description: "Desistir e retornar à etapa inicial." }
+          ]
+        }
       ]
     } : undefined);
   };

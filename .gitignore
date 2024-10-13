@@ -3,3 +3,4 @@
 /.wwebjs_cache
 /instantclient_21_13
 /out
+.env

@@ -2,7 +2,6 @@ import { PossibleClients } from "../types/types";
 
 export interface IMessageClient {
   start(): Promise<void>;
-  //sendMessage(number: string | number, message: string, otherProps?: any): Promise<any>;
   sendMessage(number: string | number, message: string, configs?: ISendMessageConfigs, otherProps?: any): Promise<any>;
   on(event: string, callback: Function): any;
   getClientType(): PossibleClients;
@@ -10,6 +9,7 @@ export interface IMessageClient {
 
 export interface ISendMessageConfigs {
   options?: ISendMessageOption[],
+  listOptions?: ISendMessageListOption[]
   header?: string,
   footer?: string,
   listButtonName?: string,
@@ -18,4 +18,13 @@ export interface ISendMessageConfigs {
 
 export interface ISendMessageOption {
   name: string
+}
+
+export interface ISendMessageListOption {
+  sectionName: string,
+  rows: IListRow[]
+}
+export interface IListRow {
+  name: string,
+  description?: string
 }

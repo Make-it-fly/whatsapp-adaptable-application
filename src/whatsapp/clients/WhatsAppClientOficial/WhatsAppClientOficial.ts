@@ -6,6 +6,7 @@ import path from 'path';
 import https from 'https';
 import { IMessageData } from "../../interfaces/message-data";
 import { PersonNumber, PossibleClients } from "../../types/types";
+import AppError from "../../errors/AppError";
 dotenv.config();
 
 export default class WhatsAppClientOficial implements IMessageClient {
@@ -147,6 +148,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
           }
         }
       })
+      if (!buttons) throw new AppError("Tentativa de enviar mensagem de botões sem opções definidas")
       const response = await fetch(`https://graph.facebook.com/${process.env.WPPOFICIAL_VERSION}/${process.env.WPPOFICIAL_PHONE_NUMBER_ID}/messages`, {
         method: "POST",
         headers: {
@@ -189,12 +191,36 @@ export default class WhatsAppClientOficial implements IMessageClient {
   }
   private async _fetchSendListsMessage(personNumber: PersonNumber, message: string, configs: ISendMessageConfigs) {
     try {
-      const options = configs.options.map((option, i) => {
-        return {
-          "id": `<LIST_SECTION_${i + 1}_ROW_${i + 1}_ID>`,
-          "title": option.name
-        }
-      })
+      let sections: any;
+      if (configs.options) {
+        const rows = configs.options.map((option, i) => {
+          return {
+            "id": `<LIST_SECTION_${i + 1}_ROW_${i + 1}_ID>`,
+            "title": option.name
+          }
+        })
+        sections = [
+          { title: "Escolha uma das opções", rows }
+        ]
+      }
+      if (configs.listOptions) {
+        sections = configs.listOptions.map(section => {
+          return {
+            title: section.sectionName,
+            rows: section.rows.map((option, i) => {
+              const row: { id: string, title: string, description?: string } = {
+                "id": `<LIST_SECTION_${i + 1}_ROW_${i + 1}_ID>`,
+                "title": option.name,
+              }
+              if (option.description) {
+                row.description = option.description
+              }
+              return row
+            })
+          }
+        })
+      }
+      if (!sections) throw new AppError("Tentativa de enviar mensagem de lista sem opções definidas")
       const response = await fetch(`https://graph.facebook.com/${process.env.WPPOFICIAL_VERSION}/${process.env.WPPOFICIAL_PHONE_NUMBER_ID}/messages`, {
         method: "POST",
         headers: {
@@ -220,12 +246,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
             },
             "action": {
               "button": configs?.listButtonName || "Abrir opções",
-              "sections": [
-                {
-                  title: "Escolha uma opção",
-                  rows: options
-                }
-              ]
+              "sections": sections
             }
           }
         })
