@@ -1,3 +1,3 @@
-export type PersonNumber = string | number
+export type PersonNumber = string
 
 export type PossibleClients = 'whatsappjs' | 'baileys' | 'oficial'

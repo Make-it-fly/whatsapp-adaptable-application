@@ -1,8 +1,9 @@
-import FluxManager from "../whatsapp/fluxManager";
-import { PersonNumber } from "../whatsapp/types/types";
+import FluxManager from "../fluxManager";
+import { PersonNumber } from "../types/types";
+
 
 interface IState {
-  handler: FluxManager;
+  fluxManager: FluxManager;
   handleOption(option: string | number, personNumber: PersonNumber): void;
   render?(personNumber: PersonNumber): Promise<void>;
   sendMessage?(number: string | number, message: string, otherProps?: any): Promise<any>;

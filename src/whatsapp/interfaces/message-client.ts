@@ -1,4 +1,4 @@
-import { PossibleClients } from "../whatsapp/types/types";
+import { PossibleClients } from "../types/types";
 
 export interface IMessageClient {
   start(): Promise<void>;

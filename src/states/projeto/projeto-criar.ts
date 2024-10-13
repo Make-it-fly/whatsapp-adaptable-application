@@ -1,19 +1,28 @@
 import { Projeto } from "../../classes/projeto";
-import State from "../../classes/state";
-import IState from "../../interfaces/state";
+import State from "../../whatsapp/state";
+import IState from "../../whatsapp/interfaces/state";
+import { PersonNumber } from "../../whatsapp/types/types";
+import { ProjetoManager } from "../../classes/projeto-manager";
 
 
 class ProjetoCriarState extends State implements IState {
 
-    public async handleOption(body: string | number, personNumber: string) {
-        const novoProjeto = new Projeto(body.toString())
-        this.manager.adicionarProjeto(novoProjeto)
+    public async render(personNumber: PersonNumber): Promise<void> {
+        const message = 'Perfeito, vamos criar um novo projeto. Primeiramente, como será o nome dele?';
+        await this.fluxManager.client.sendMessage(personNumber, message);
+    }
+
+    public async handleOption(body: string, personNumber: string) {
+        if (body.toLowerCase().replace(" ", "") == 'cancelar') {
+            return await this.cancel(personNumber)
+        }
+        const manager = ProjetoManager.getInstance()
+        const novoProjeto = new Projeto(body)
+        manager.adicionarProjeto(novoProjeto)
         const sendingMessage = `Maravilha, o projeto com o nome: *${novoProjeto.nome}* foi criado. `
-        console.log(this.manager.listarProjetos())
-        await this.handler.client.sendMessage(personNumber, sendingMessage);
-        this.handler.setPersonState(personNumber, "projeto-gerenciar");
-        this.manager.selecionarProjeto(personNumber, novoProjeto)
-        this.handler.stateMap["projeto-gerenciar"].call!(personNumber);
+        await this.fluxManager.client.sendMessage(personNumber, sendingMessage);
+        manager.selecionarProjeto(personNumber, novoProjeto)
+        this.fluxManager.setPersonState(personNumber, "projeto-gerenciar").render(personNumber);
     }
 }
 

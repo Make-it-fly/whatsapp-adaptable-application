@@ -1,4 +1,4 @@
-import { PersonNumber } from "../whatsapp/types/types";
+import { PersonNumber } from "../types/types";
 
 export interface IMessageData {
   msg?: any,

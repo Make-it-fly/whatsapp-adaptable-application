@@ -2,15 +2,16 @@ import { ProjetoManager } from "../classes/projeto-manager";
 import { IMessageClient } from "./interfaces/message-client";
 import { IMessageData } from "./interfaces/message-data";
 import IState from "./interfaces/state";
-import InitialState from "../states/initial";
-import InitialSelecionarProjetoState from "../states/projeto/initial-selecionar-projeto";
-import ProjetoAtividadeDeletarState from "../states/projeto/atividade/projeto-atividade-deletar";
-import ProjetoGerenciar from "../states/projeto/projeto-gerenciar";
-import StartState from "../states/start";
+import fs from 'fs';
+import path from 'path';
 import { PersonNumber } from "./types/types";
+import WelcomeState from "../states/welcome";
+import SelecionarProjetoState from "../states/projeto/selecionar-projeto";
 import ProjetoCriarState from "../states/projeto/projeto-criar";
+import ProjetoGerenciar from "../states/projeto/projeto-gerenciar";
 import ProjetoAtividadeCriarState from "../states/projeto/atividade/projeto-atividade-criar";
 import ProjetoAtividadeAlterarState from "../states/projeto/atividade/projeto-atividade-alterar";
+import ProjetoAtividadeDeletarState from "../states/projeto/atividade/projeto-atividade-deletar";
 
 const allowedNumbers = [
     '5524981017270',
@@ -21,32 +22,33 @@ interface StateMap {
     [key: string]: IState
 }
 
-interface IChatStates {
-    [key: string]: {
-        lastMessageDate: number,
-        state: string,
-        pix?: {
-            to?: string,
-            value: string,
-        },
-        vars?: any
-    }
+interface IPeopleContext {
+    [key: PersonNumber]: IPersonContext
+}
+
+interface IPersonContext {
+    lastMessageDate: number,
+    stateName: string,
+    pix?: {
+        to?: string,
+        value: string,
+    },
+    vars?: any
 }
 
 class FluxManager {
-    private personStates: IChatStates;
+    private peopleContext: IPeopleContext;
     stateMap: StateMap;
     manager: ProjetoManager;
     client: IMessageClient;
 
     constructor(client: IMessageClient) {
-        this.personStates = {};
+        this.peopleContext = {};
         this.client = client;
         this.manager = ProjetoManager.getInstance()
         this.stateMap = {
-            "start": new StartState(this),
-            "initial": new InitialState(this),
-            "initial-selecionar-projeto": new InitialSelecionarProjetoState(this),
+            "welcome": new WelcomeState(this),
+            "selecionar-projeto": new SelecionarProjetoState(this),
             "projeto-criar": new ProjetoCriarState(this),
             "projeto-gerenciar": new ProjetoGerenciar(this),
             "projeto-atividade-criar": new ProjetoAtividadeCriarState(this),
@@ -65,19 +67,18 @@ class FluxManager {
 
     async handle({ personName, deviceType, body, personNumber, msg }: IMessageData) {
         if (!this.checkPermission({ personNumber, personName })) return;
-        this.configUserState(personNumber);
-        const state = this.getPersonState(personNumber);
+        const { firstAccess } = this.configUserState(personNumber);
+        if (firstAccess) {
+            return this.getPersonState(personNumber).render(personNumber)
+        } //Checa se é o primeiro acesso do usuário. Se sim, o welcomeState é chamado e a função é interrompida
 
-        console.log(`Acesso: ${personNumber} (${personName}) Estado: ${state}`)
+        const personContext = this.getPersonContext(personNumber);
+        const currentState: IState = this.stateMap[personContext.stateName];
 
-        if (state === "start") {
-            return this.stateMap.start.render(personNumber);
-        }
-
-        const currentStateHandler: IState = this.stateMap[state];
+        console.log(`Acesso: ${personNumber} (${personName}) Estado: ${personContext}`)
         try {
-            if (currentStateHandler) {
-                return currentStateHandler.handleOption(body, personNumber);
+            if (currentState) {
+                return currentState.handleOption(body, personNumber);
             } else {
                 return this.client.sendMessage(personNumber, "Não entendi, por favor, escolha uma das opções disponíveis.");
             }
@@ -86,31 +87,63 @@ class FluxManager {
         }
     }
 
-    configUserState(personNumber: string | number) {
-        if (!this.personStates[personNumber]) {
-            this.personStates[personNumber] = {
+    configUserState(personNumber: PersonNumber) {
+        if (!this.peopleContext[personNumber]) {
+            this.peopleContext[personNumber] = {
                 lastMessageDate: Date.now(),
-                state: 'start'
+                stateName: 'welcome'
             };
+            return { firstAccess: true }
         }
+        return { firstAccess: false }
     }
 
-    getPersonState(personNumber: PersonNumber) {
-        return this.personStates[personNumber].state;
+    getPersonContext(personNumber: PersonNumber) {
+        return this.peopleContext[personNumber];
     }
 
-    getPersonStateInstance(personNumber: PersonNumber) {
-        return this.personStates[personNumber];
+    getPersonState(personNumber: PersonNumber): IState {
+        return this.stateMap[this.getPersonContext(personNumber).stateName];
     }
 
-    setPersonState(personNumber: PersonNumber, state: string) {
-        this.personStates[personNumber].state = state;
-        this.personStates[personNumber].lastMessageDate = Date.now();
+    setPersonState(personNumber: PersonNumber, stateName: string): IState {
+        this.peopleContext[personNumber].stateName = stateName;
+        this.getPersonContext(personNumber).lastMessageDate = Date.now();
+        return this.stateMap[stateName]
     }
 
     resetPersonState(personNumber: PersonNumber) {
-        delete this.personStates[personNumber]
+        delete this.peopleContext[personNumber]
         this.configUserState(personNumber)
+    }
+
+    private loadStates(): StateMap {
+        const statesDir = path.resolve(__dirname, '../states');
+        const stateMap: StateMap = {};
+
+        const readStatesRecursively = (dir: string) => {
+            fs.readdirSync(dir).forEach((file) => {
+                const fullPath = path.join(dir, file);
+                const stat = fs.statSync(fullPath);
+
+                if (stat.isDirectory()) {
+                    readStatesRecursively(fullPath);
+                } else if (file.endsWith('.ts')) {
+                    const stateName = path.basename(file, path.extname(file));
+                    try {
+                        const StateClass = require(fullPath).default;
+                        if (StateClass && typeof StateClass === 'function') {
+                            stateMap[stateName] = new StateClass(this);
+                        }
+                    } catch (error) {
+                        console.error(`Erro ao importar o estado ${stateName}:`, error);
+                    }
+                }
+            });
+        };
+
+        readStatesRecursively(statesDir);
+        return stateMap;
     }
 }
 
