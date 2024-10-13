@@ -109,7 +109,15 @@ export default class WhatsAppClientOficial implements IMessageClient {
     }
   }
 
-  private async _fetchSendMessage(personNumber: PersonNumber, message: string, configs: ISendMessageConfigs) {
+  private async _fetchSendMessage(personNumber: PersonNumber, message: string, configs?: ISendMessageConfigs) {
+    let sendingMessage = ""
+    if (configs?.header) {
+      sendingMessage += `*${configs.header}*\n`
+    }
+    sendingMessage += message
+    if (configs?.footer) {
+      sendingMessage += `\n_${configs.footer}_`
+    }
     try {
       const response = await fetch(`https://graph.facebook.com/${process.env.WPPOFICIAL_VERSION}/${process.env.WPPOFICIAL_PHONE_NUMBER_ID}/messages`, {
         method: "POST",
@@ -124,7 +132,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
           type: "text",
           text: {
             preview_url: false,
-            body: message
+            body: sendingMessage
           }
         })
       })
@@ -144,7 +152,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
           "type": "reply",
           "reply": {
             "id": i,
-            "title": option.name
+            "title": this._limitString(option.name, 20)
           }
         }
       })
@@ -196,7 +204,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         const rows = configs.options.map((option, i) => {
           return {
             "id": `<LIST_SECTION_${i + 1}_ROW_${i + 1}_ID>`,
-            "title": option.name
+            "title": this._limitString(option.name, 24)
           }
         })
         sections = [
@@ -210,10 +218,10 @@ export default class WhatsAppClientOficial implements IMessageClient {
             rows: section.rows.map((option, i) => {
               const row: { id: string, title: string, description?: string } = {
                 "id": `<LIST_SECTION_${i + 1}_ROW_${i + 1}_ID>`,
-                "title": option.name,
+                "title": this._limitString(option.name, 24),
               }
               if (option.description) {
-                row.description = option.description
+                row.description = this._limitString(option.description, 72)
               }
               return row
             })
@@ -296,5 +304,9 @@ export default class WhatsAppClientOficial implements IMessageClient {
       }
       return
     }
+  }
+  private _limitString(string: string, maxLength: number): string {
+    // Limita para até maxLength caracteres, útil para import os limites que a Api da Meta define para seus elementos
+    return string.length > maxLength ? string.slice(0, (maxLength - 3)) + '...' : string
   }
 }

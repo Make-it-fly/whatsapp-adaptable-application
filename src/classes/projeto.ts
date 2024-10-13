@@ -20,9 +20,12 @@ export class Projeto {
 
   descreverAtividades() {
     if (this.contarAtividades() > 0) {
-      let mensagem = `*Atividades do Projeto ${this.nome}:*\n`
+      let mensagem = `*==Atividades do Projeto ${this.nome}==*\n`
       this.atividades.forEach((atividade, i) => {
-        mensagem += `- ${atividade.nome}\n`
+        mensagem += `*${atividade.nome}:*\n`
+        if (atividade.descricao) {
+          mensagem += `_${atividade.descricao}_\n`
+        }
       })
       return mensagem
     } else {
