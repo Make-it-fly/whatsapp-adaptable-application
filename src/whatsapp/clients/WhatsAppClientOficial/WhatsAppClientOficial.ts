@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 import { IMessageData } from "../../interfaces/message-data";
-import { PossibleClients } from "../../types/types";
+import { PersonNumber, PossibleClients } from "../../types/types";
 dotenv.config();
 
 export default class WhatsAppClientOficial implements IMessageClient {
@@ -108,7 +108,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
     }
   }
 
-  private async _fetchSendMessage(number: string, message: string, configs: ISendMessageConfigs) {
+  private async _fetchSendMessage(personNumber: PersonNumber, message: string, configs: ISendMessageConfigs) {
     try {
       const response = await fetch(`https://graph.facebook.com/${process.env.WPPOFICIAL_VERSION}/${process.env.WPPOFICIAL_PHONE_NUMBER_ID}/messages`, {
         method: "POST",
@@ -119,7 +119,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         body: JSON.stringify({
           messaging_product: "whatsapp",
           recipient_type: "individual",
-          to: number,
+          to: personNumber,
           type: "text",
           text: {
             preview_url: false,
@@ -128,7 +128,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         })
       })
       if (!response.ok) {
-        throw new Error(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
+        throw new Error(`Erro ao enviar mensagem para o numero: ${personNumber}. conteudo: ${message}`)
       }
 
       const data = await response.json();
@@ -136,7 +136,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
       console.error(error)
     }
   }
-  private async _fetchSendButtonsMessage(number: string, message: string, configs: ISendMessageConfigs) {
+  private async _fetchSendButtonsMessage(personNumber: PersonNumber, message: string, configs: ISendMessageConfigs) {
     try {
       const buttons = configs.options.map((option, i) => {
         return {
@@ -156,7 +156,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         body: JSON.stringify({
           "messaging_product": "whatsapp",
           "recipient_type": "individual",
-          "to": number,
+          "to": personNumber,
           "type": "interactive",
           "interactive": {
             "type": "button",
@@ -177,7 +177,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         })
       })
       if (!response.ok) {
-        throw new Error(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
+        throw new Error(`Erro ao enviar mensagem para o numero: ${personNumber}. conteudo: ${message}`)
       }
 
       const data = await response.json();
@@ -187,7 +187,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
       console.error(error)
     }
   }
-  private async _fetchSendListsMessage(number: string, message: string, configs: ISendMessageConfigs) {
+  private async _fetchSendListsMessage(personNumber: PersonNumber, message: string, configs: ISendMessageConfigs) {
     try {
       const options = configs.options.map((option, i) => {
         return {
@@ -204,7 +204,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         body: JSON.stringify({
           "messaging_product": "whatsapp",
           "recipient_type": "individual",
-          "to": number,
+          "to": personNumber,
           "type": "interactive",
           "interactive": {
             "type": "list",
@@ -231,7 +231,7 @@ export default class WhatsAppClientOficial implements IMessageClient {
         })
       })
       if (!response.ok) {
-        throw new Error(`Erro ao enviar mensagem para o numero: ${number}. conteudo: ${message}`)
+        throw new Error(`Erro ao enviar mensagem para o numero: ${personNumber}. conteudo: ${message}`)
       }
 
       const data = await response.json();
@@ -253,6 +253,9 @@ export default class WhatsAppClientOficial implements IMessageClient {
           if (!body.messages[0]?.interactive) return
           if (body.messages[0].interactive.type == 'list_reply') {
             messageData.body = body.messages[0].interactive.list_reply.title
+          }
+          if (body.messages[0].interactive.type == 'button_reply') {
+            messageData.body = body.messages[0].interactive.button_reply.title
           }
         } else {
           messageData.body = body.messages[0].text.body

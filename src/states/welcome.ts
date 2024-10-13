@@ -19,7 +19,7 @@ class WelcomeState extends State implements IState {
     const message = "*Olá, vamos gerir nossas atividades? Escolha uma das opções:*"
       + `\n _Temos um total de *${this.fluxManager.manager.contarProjetos()}* projetos ativos_`
     await this.fluxManager.client.sendMessage(personNumber, message, {
-      type: "list",
+      type: "buttons",
       options: [
         { name: "Gerir um projeto" },
         { name: "Criar um projeto" },

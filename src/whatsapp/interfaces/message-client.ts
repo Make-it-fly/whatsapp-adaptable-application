@@ -13,7 +13,7 @@ export interface ISendMessageConfigs {
   header?: string,
   footer?: string,
   listButtonName?: string,
-  type?: 'buttons' | 'list' | 'buttons-or-list' | 'media'
+  type?: 'buttons' | 'list' | 'media'
 }
 
 export interface ISendMessageOption {
