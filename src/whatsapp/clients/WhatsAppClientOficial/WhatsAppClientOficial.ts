@@ -202,10 +202,14 @@ export default class WhatsAppClientOficial implements IMessageClient {
       let sections: any;
       if (configs.options) {
         const rows = configs.options.map((option, i) => {
-          return {
+          const row: { id: string, title: string, description?: string } = {
             "id": `<LIST_SECTION_${i + 1}_ROW_${i + 1}_ID>`,
             "title": this._limitString(option.name, 24)
           }
+          if (option.description) {
+            row.description = this._limitString(option.description, 72)
+          }
+          return row
         })
         sections = [
           { title: "Escolha uma das opções", rows }

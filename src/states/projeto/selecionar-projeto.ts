@@ -1,5 +1,4 @@
 import State from "../../whatsapp/state";
-import FluxManager from "../../whatsapp/fluxManager";
 import IState from "../../whatsapp/interfaces/state";
 import { PersonNumber } from "../../whatsapp/types/types";
 import { ProjetoManager } from "../../classes/projeto-manager";
@@ -7,11 +6,30 @@ import { ProjetoManager } from "../../classes/projeto-manager";
 class SelecionarProjetoState extends State implements IState {
 
   public async render(personNumber: PersonNumber): Promise<void> {
-    const message = 'Digite o nome do projeto que você quer gerenciar';
-    await this.fluxManager.client.sendMessage(personNumber, message);
+    const projetos = ProjetoManager.getInstance().listarProjetos();
+    const message = 'Muito bem, escolha o projeto que você quer administrar.';
+    await this.client.sendMessage(personNumber, message, {
+      type: "list",
+      listOptions: [
+        {
+          sectionName: "Projetos",
+          rows: projetos.map(projeto => {
+            return { name: projeto.nome, description: projeto.nome }
+          })
+        },
+        {
+          sectionName: "Outros", rows: [
+            { name: "Cancelar", description: "Desistir e retornar à etapa inicial." }
+          ]
+        }
+      ]
+    });
   }
 
-  public async handleOption(body: string | number, personNumber: string) {
+  public async handleOption(body: string, personNumber: string) {
+    if (body.toLowerCase().replace(" ", "") == 'cancelar') {
+      return this.cancel(personNumber)
+    }
     const projetoManager = ProjetoManager.getInstance();
     const projeto = projetoManager.obterProjeto(body.toString().trim().toLowerCase())
     if (projeto) {

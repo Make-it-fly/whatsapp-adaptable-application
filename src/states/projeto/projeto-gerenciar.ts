@@ -36,7 +36,7 @@ class ProjetoGerenciar extends State implements IState {
         },
         {
           sectionName: "Outros", rows: [
-            { name: "cancelar", description: "Desistir e retornar à etapa inicial." }
+            { name: "Cancelar", description: "Desistir e retornar à etapa inicial." }
           ]
         }
       ]

@@ -17,14 +17,11 @@ export interface ISendMessageConfigs {
 }
 
 export interface ISendMessageOption {
-  name: string
+  name: string,
+  description?: string
 }
 
 export interface ISendMessageListOption {
   sectionName: string,
-  rows: IListRow[]
-}
-export interface IListRow {
-  name: string,
-  description?: string
+  rows: ISendMessageOption[]
 }
