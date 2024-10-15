@@ -39,7 +39,7 @@ class ProjetoAtividadeDeletarState extends State implements IState {
     if (body.toLowerCase().replace(" ", "") == 'cancelar') {
       return this.cancel(personNumber)
     }
-    const projetoSelecionado = this.fluxManager.manager.getProjetoSelecionado(personNumber);
+    const projetoSelecionado = this.fluxManager.projetoManager.getProjetoSelecionado(personNumber);
     const atividadeParaDeletar = projetoSelecionado.getAtividade(body.replace("...", ""));
     if (!atividadeParaDeletar) {
       return this.client.sendMessage(personNumber, "Atividade não encontrada!")

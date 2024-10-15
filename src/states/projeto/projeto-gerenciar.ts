@@ -19,12 +19,13 @@ class ProjetoGerenciar extends State implements IState {
     let message = ""
     const projetoSelecionado = ProjetoManager.getInstance().getProjetoSelecionado(personNumber)
     if (projetoSelecionado) {
-      message = `Vamos gerenciar o projeto ${projetoSelecionado.nome}? O que deseja fazer neste projeto?`
+      message = `Vamos gerenciar o projeto ${projetoSelecionado.nome}? O que deseja fazer neste projeto?\n`
+      message += projetoSelecionado.descreverAtividades();
     } else {
-      message = 'Digite o nome do projeto que você quer gerenciar';
+      this.fluxManager.setPersonState(personNumber, "selecionar-projeto").render(personNumber)
     }
     this.fluxManager.setPersonState(personNumber, "projeto-gerenciar");
-    await this.client.sendMessage(personNumber, message, projetoSelecionado ? {
+    /* await this.client.sendMessage(personNumber, message, projetoSelecionado ? {
       type: "list",
       listOptions: [
         {
@@ -39,6 +40,14 @@ class ProjetoGerenciar extends State implements IState {
             { name: "Cancelar", description: "Desistir e retornar à etapa inicial." }
           ]
         }
+      ]
+    } : undefined); */
+    await this.client.sendMessage(personNumber, message, projetoSelecionado ? {
+      type: "buttons",
+      options: [
+        { name: "Adicionar Atividade" },
+        { name: "Deletar Atividades" },
+        { name: "Cancelar" }
       ]
     } : undefined);
   };
@@ -70,7 +79,7 @@ class ProjetoGerenciar extends State implements IState {
     if (body.toLowerCase().replace(" ", "") == 'cancelar') {
       return this.cancel(personNumber)
     }
-    const projetoSelecionado = this.fluxManager.manager.getProjetoSelecionado(personNumber)
+    const projetoSelecionado = this.fluxManager.projetoManager.getProjetoSelecionado(personNumber)
     if (projetoSelecionado) {
       const action = this.getAction(body);
       if (action) {
@@ -80,7 +89,7 @@ class ProjetoGerenciar extends State implements IState {
         await this.fluxManager.client.sendMessage(personNumber, message);
       }
     } else {
-      const projeto = this.fluxManager.manager.obterProjeto(body.toString())
+      const projeto = this.fluxManager.projetoManager.obterProjeto(body.toString())
       if (!projeto) {
         return this.client.sendMessage(personNumber, "Não encontrei esse projeto que você mencionou. Tem certeza que o nome é esse? Repita o nome, por favor. Ou escreva 'cancelar' para desistir")
       }

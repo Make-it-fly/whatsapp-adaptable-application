@@ -16,7 +16,7 @@ class ProjetoAtividadeCriarState extends State implements IState {
   }
 
   public async handleOption(body: string, personNumber: string) {
-    const projetoSelecionado = this.fluxManager.manager.getProjetoSelecionado(personNumber);
+    const projetoSelecionado = this.fluxManager.projetoManager.getProjetoSelecionado(personNumber);
     let nome = ""
     let descricao = ""
     if (body.includes(";")) {

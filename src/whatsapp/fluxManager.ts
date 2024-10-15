@@ -39,13 +39,13 @@ interface IPersonContext {
 class FluxManager {
     private peopleContext: IPeopleContext;
     stateMap: StateMap;
-    manager: ProjetoManager;
+    projetoManager: ProjetoManager;
     client: IMessageClient;
 
     constructor(client: IMessageClient) {
         this.peopleContext = {};
         this.client = client;
-        this.manager = ProjetoManager.getInstance()
+        this.projetoManager = ProjetoManager.getInstance()
         this.stateMap = {
             "welcome": new WelcomeState(this),
             "selecionar-projeto": new SelecionarProjetoState(this),

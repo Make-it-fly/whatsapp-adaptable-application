@@ -18,8 +18,12 @@ export class ProjetoManager {
     return ProjetoManager.instance;
   }
 
-  selecionarProjeto(number: PersonNumber, projeto: Projeto) {
-    this.chatProjects[number] = projeto
+  selecionarProjeto(number: PersonNumber, projeto: Projeto | string) {
+    if (projeto instanceof Projeto) {
+      this.chatProjects[number] = projeto
+    } else {
+      this.chatProjects[number] = this.obterProjeto(projeto)
+    }
   }
   desselecionarProjeto(number: PersonNumber) {
     if (this.chatProjects[number]) {
@@ -36,8 +40,14 @@ export class ProjetoManager {
     }
   }
 
-  adicionarProjeto(projeto: Projeto) {
-    this.projetos.push(projeto);
+  adicionarProjeto(projeto: Projeto | string) {
+    if (projeto instanceof Projeto) {
+      this.projetos.push(projeto);
+    }
+    if (typeof projeto === "string") {
+      const newProjeto = new Projeto(projeto)
+      this.projetos.push(newProjeto)
+    }
   }
 
   removerProjeto(projetoId: string) {
