@@ -63,7 +63,7 @@ class WelcomeState extends State implements IState {
     const data = body.split(" ")
     if (data[1]) {
       const projetoManager = ProjetoManager.getInstance()
-      const novoProjeto = new Projeto(data.slice(1).join(" "))
+      const novoProjeto = new Projeto(data.slice(1).join(" ").replace("\n", ""))
       projetoManager.adicionarProjeto(novoProjeto)
       const sendingMessage = `Maravilha, o projeto com o nome: *${novoProjeto.nome}* foi criado. `
       await this.fluxManager.client.sendMessage(personNumber, sendingMessage);
@@ -82,8 +82,13 @@ class WelcomeState extends State implements IState {
       const macroData = rawData[1].split(" ")
       const nomeDoProjeto = macroData.slice(1).join(" ");
       if (!nomeDoProjeto) throw new AppError()
-      const projeto = this.fluxManager.projetoManager.obterProjeto(nomeDoProjeto)
-      if (!projeto) return await this.fluxManager.client.sendMessage(personNumber, `Projeto "${nomeDoProjeto}" não encontrado!`)
+      let projeto = this.fluxManager.projetoManager.obterProjeto(nomeDoProjeto)
+      //if (!projeto) return await this.fluxManager.client.sendMessage(personNumber, `Projeto "${nomeDoProjeto}" não encontrado!`)
+      if (!projeto) {
+        projeto = new Projeto(nomeDoProjeto.replace("\n", ""))
+        this.fluxManager.projetoManager.adicionarProjeto(projeto)
+        await this.fluxManager.client.sendMessage(personNumber, `Um novo projeto foi criado com o nome "${nomeDoProjeto}"`)
+      }
 
       // Verifica o resto do macro para adicionar as atividades em massa
       const atividadesCommands = rawData.slice(2)
@@ -92,8 +97,8 @@ class WelcomeState extends State implements IState {
         let atividadeDescricao = ""
         if (!atividadeCommand) continue;
         if (atividadeCommand.includes(";")) {
-          atividadeNome = atividadeCommand.split(";")[0]
-          atividadeDescricao = atividadeCommand.split(";")[1]
+          atividadeNome = atividadeCommand.split(";")[0].replace("\n", "")
+          atividadeDescricao = atividadeCommand.split(";")[1].replace("\n", "")
         } else {
           atividadeNome = atividadeCommand
         }
