@@ -38,7 +38,7 @@ class ChooseBetState extends State implements IState {
     }
     const personContext = this.fluxManager.getPersonContext(personNumber)
     personContext.vars.agencia = body
-    this.fluxManager.setPersonState(personNumber, 'choose-amount').render(personNumber)
+    await this.fluxManager.setPersonState(personNumber, 'choose-amount').render(personNumber)
   }
 
 }

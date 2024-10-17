@@ -17,7 +17,7 @@ class TransferConfirmState extends State implements IState {
         const personContext = this.fluxManager.getPersonContext(personNumber)
         const message = `*Confirmação de transferência*\n`
             + `Você confirma a transação de ${personContext.vars.amount} para a agência ${personContext.vars.agencia}?`;
-        this.client.sendMessage(personNumber, message, {
+        await this.client.sendMessage(personNumber, message, {
             type: "buttons",
             options: [
                 { name: "Confirmar" },

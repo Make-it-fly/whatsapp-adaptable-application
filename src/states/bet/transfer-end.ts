@@ -15,7 +15,7 @@ class TransferEndState extends State implements IState {
         const personContext = this.fluxManager.getPersonContext(personNumber)
         const message = `*Transação realizada*\n`
             + `A transação de ${personContext.vars.amount} para a agência ${personContext.vars.agencia} foi realizada.`;
-        this.client.sendMessage(personNumber, message);
+        await this.client.sendMessage(personNumber, message);
         await this.fluxManager.setPersonState(personNumber, 'welcome').render(personNumber);
         personContext.vars = {}
 

@@ -21,12 +21,12 @@ class ChooseAmountState extends State implements IState {
             return await this.cancel(personNumber)
         }
         if (!this._isValidMoney(body)) {
-            this.client.sendMessage(personNumber, "Desculpe, não entendi o que você digitou. tente digitar em um formato como: _00,00_")
+            await this.client.sendMessage(personNumber, "Desculpe, não entendi o que você digitou. tente digitar em um formato como: _00,00_")
         }
         const amount = this._formatToCurrency(body)
         const personContext = this.fluxManager.getPersonContext(personNumber)
         personContext.vars.amount = amount
-        this.fluxManager.setPersonState(personNumber, 'transfer-confirm').render(personNumber)
+        await this.fluxManager.setPersonState(personNumber, 'transfer-confirm').render(personNumber)
     }
 
     private _isValidMoney(value: string): boolean {

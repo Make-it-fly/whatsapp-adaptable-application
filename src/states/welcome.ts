@@ -23,7 +23,7 @@ class WelcomeState extends State implements IState {
   }
   private async _transferir(personNumber: PersonNumber) {
     console.log(this)
-    this.fluxManager.setPersonState(personNumber, 'choose-bet').render(personNumber)
+    await this.fluxManager.setPersonState(personNumber, 'choose-bet').render(personNumber)
   }
 
 }
