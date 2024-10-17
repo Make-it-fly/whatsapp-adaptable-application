@@ -6,12 +6,10 @@ import fs from 'fs';
 import path from 'path';
 import { PersonNumber } from "./types/types";
 import WelcomeState from "../states/welcome";
-import SelecionarProjetoState from "../states/projeto/selecionar-projeto";
-import ProjetoCriarState from "../states/projeto/projeto-criar";
-import ProjetoGerenciar from "../states/projeto/projeto-gerenciar";
-import ProjetoAtividadeCriarState from "../states/projeto/atividade/projeto-atividade-criar";
-import ProjetoAtividadeAlterarState from "../states/projeto/atividade/projeto-atividade-alterar";
-import ProjetoAtividadeDeletarState from "../states/projeto/atividade/projeto-atividade-deletar";
+import ChooseBetState from "../states/bet/choose-bet";
+import TransferConfirmState from "../states/bet/transfer-confirm";
+import ChooseAmountState from "../states/bet/choose-amount";
+import TransferEndState from "../states/bet/transfer-end";
 
 const allowedNumbers = [
     '5524981017270',
@@ -29,10 +27,6 @@ interface IPeopleContext {
 interface IPersonContext {
     lastMessageDate: number,
     stateName: string,
-    pix?: {
-        to?: string,
-        value: string,
-    },
     vars?: any
 }
 
@@ -48,12 +42,10 @@ class FluxManager {
         this.projetoManager = ProjetoManager.getInstance()
         this.stateMap = {
             "welcome": new WelcomeState(this),
-            "selecionar-projeto": new SelecionarProjetoState(this),
-            "projeto-criar": new ProjetoCriarState(this),
-            "projeto-gerenciar": new ProjetoGerenciar(this),
-            "projeto-atividade-criar": new ProjetoAtividadeCriarState(this),
-            "projeto-atividade-alterar": new ProjetoAtividadeAlterarState(this),
-            "projeto-atividade-deletar": new ProjetoAtividadeDeletarState(this)
+            'choose-bet': new ChooseBetState(this),
+            'choose-amount': new ChooseAmountState(this),
+            'transfer-confirm': new TransferConfirmState(this),
+            'transfer-end': new TransferEndState(this)
         };
     }
 
@@ -91,7 +83,8 @@ class FluxManager {
         if (!this.peopleContext[personNumber]) {
             this.peopleContext[personNumber] = {
                 lastMessageDate: Date.now(),
-                stateName: 'welcome'
+                stateName: 'welcome',
+                vars: {}
             };
             return { firstAccess: true }
         }

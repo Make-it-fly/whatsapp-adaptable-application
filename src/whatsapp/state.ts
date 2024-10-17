@@ -7,7 +7,7 @@ import { ProjetoManager } from "../classes/projeto-manager";
 class State implements IState {
   fluxManager: FluxManager;
   client: IMessageClient;
-  protected optionsMap: Record<string | number, (personNumber: PersonNumber) => void>;
+  protected optionsMap: Record<string | number, (personNumber: PersonNumber, body: string) => void>;
 
   constructor(fluxManager: FluxManager) {
     this.fluxManager = fluxManager;
@@ -22,14 +22,14 @@ class State implements IState {
     }
     const action = this.getAction(body);
     if (action) {
-      action(personNumber);
+      action(personNumber, body);
     } else {
       const message = 'Opção inválida. Por favor, escolha uma das opções disponíveis.';
       await this.fluxManager.client.sendMessage(personNumber, message);
     }
   }
 
-  public async cancel(personNumber) {
+  public async cancel(personNumber: PersonNumber) {
     await this.fluxManager.client.sendMessage(personNumber, "Ok, cancelando a sua ação.")
     this.fluxManager.setPersonState(personNumber, "welcome").render(personNumber)
   }
