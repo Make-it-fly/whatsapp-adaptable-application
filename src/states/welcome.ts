@@ -8,22 +8,27 @@ class WelcomeState extends State implements IState {
   constructor(fluxManager: FluxManager) {
     super(fluxManager)
     this.optionsMap = {
-      "Transferir": this._transferir.bind(this)
+      "Realizar Biometria": this._realizarBiometria.bind(this),
+      "Não tenho conta": this._naoTenhoConta.bind(this),
     };
   }
 
   public async render(personNumber: PersonNumber) {
-    const message = "*Olá, no que podemos te ajudar?*"
+    const message = "Olá, bem vindo a *Okto Payment*. Realize a biometria facial para acessar sua conta."
     await this.fluxManager.client.sendMessage(personNumber, message, {
       type: "buttons",
       options: [
-        { name: "Transferir" },
+        { name: "Realizar Biometria" },
+        { name: "Não tenho conta" },
       ]
     });
   }
-  private async _transferir(personNumber: PersonNumber) {
-    console.log(this)
-    this.fluxManager.setPersonState(personNumber, 'choose-bet').render(personNumber)
+  private async _naoTenhoConta(personNumber: PersonNumber) {
+    await this.fluxManager.client.sendMessage(personNumber, "Sem problema, crie sua conta no nosso aplicativo:");
+    await this.fluxManager.client.sendMessage(personNumber, "Okto.com/download");
+  }
+  private async _realizarBiometria(personNumber: PersonNumber) {
+    this.fluxManager.setPersonState(personNumber, 'biometria').render(personNumber)
   }
 
 }

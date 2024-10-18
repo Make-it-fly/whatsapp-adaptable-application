@@ -31,6 +31,8 @@ class State implements IState {
 
   public async cancel(personNumber: PersonNumber) {
     await this.fluxManager.client.sendMessage(personNumber, "Ok, cancelando a sua ação.")
+    const personContext = this.fluxManager.getPersonContext(personNumber)
+    personContext.vars = {}
     this.fluxManager.setPersonState(personNumber, "welcome").render(personNumber)
   }
 

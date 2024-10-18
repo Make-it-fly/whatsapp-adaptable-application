@@ -6,10 +6,15 @@ import fs from 'fs';
 import path from 'path';
 import { PersonNumber } from "./types/types";
 import WelcomeState from "../states/welcome";
-import ChooseBetState from "../states/bet/choose-bet";
-import TransferConfirmState from "../states/bet/transfer-confirm";
-import ChooseAmountState from "../states/bet/choose-amount";
-import TransferEndState from "../states/bet/transfer-end";
+import HelloUserState from "../states/hello-user";
+import SaqueState from "../states/saque/saque";
+import SaqueChooseKeyState from "../states/saque/saque-choose-key";
+import SaqueEndState from "../states/saque/saque-end";
+import BiometriaState from "../states/biometria";
+import DepositarState from "../states/depositar/depositar";
+import TransferirBetEndState from "../states/transferir-bet/transferir-bet-end";
+import TransferirBetAmountState from "../states/transferir-bet/transferir-bet-amount";
+import TransferirBetState from "../states/transferir-bet/transferir-bet";
 
 const allowedNumbers = [
     '5524981017270',
@@ -42,10 +47,15 @@ class FluxManager {
         this.projetoManager = ProjetoManager.getInstance()
         this.stateMap = {
             "welcome": new WelcomeState(this),
-            'choose-bet': new ChooseBetState(this),
-            'choose-amount': new ChooseAmountState(this),
-            'transfer-confirm': new TransferConfirmState(this),
-            'transfer-end': new TransferEndState(this)
+            'hello-user': new HelloUserState(this),
+            'biometria': new BiometriaState(this),
+            'saque': new SaqueState(this),
+            'saque-end': new SaqueEndState(this),
+            'saque-choose-key': new SaqueChooseKeyState(this),
+            'transferir-bet': new TransferirBetState(this),
+            'transferir-bet-amount': new TransferirBetAmountState(this),
+            'transferir-bet-end': new TransferirBetEndState(this),
+            'depositar': new DepositarState(this),
         };
     }
 
